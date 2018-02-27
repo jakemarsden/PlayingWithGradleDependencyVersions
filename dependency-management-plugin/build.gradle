@@ -15,17 +15,39 @@ dependencies {
     compile localGroovy()
 }
 
+sourceSets {
+    main.java { srcDirs = [] }
+    test.java { srcDirs = [] }
+}
+
+groovydoc {
+    includePrivate true
+}
+
+task groovydocJar(type: Jar) {
+    classifier 'javadoc'
+    from groovydoc.destinationDir
+    dependsOn groovydoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+build {
+    dependsOn groovydocJar
+    dependsOn sourcesJar
+}
+
 publishing {
     publications {
         main(MavenPublication) {
             from components.java
+            artifact groovydocJar
+            artifact sourcesJar
         }
     }
-}
-
-sourceSets {
-    main.java { srcDirs = [] }
-    test.java { srcDirs = [] }
 }
 
 task install {

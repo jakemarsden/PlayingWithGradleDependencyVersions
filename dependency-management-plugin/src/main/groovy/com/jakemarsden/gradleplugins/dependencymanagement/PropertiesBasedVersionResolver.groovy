@@ -33,12 +33,13 @@ import java.util.function.Predicate
  * <li>
  * The transitive dependency version (Gradle's default behaviour)
  * <ul>
- * <li>Given that
+ * <li>
+ * Given that
  * <ul>
  * <li>None of the above methods of defining a dependency version were used</li>
  * <li><i>some-group:some-dependency</i> is a dependency of the current project</li>
  * <li><i>some-group:some-dependency</i> depends on <i>some-group:some-transitive-dependency:1.0-RELEASE</i></li>
- * </li>
+ * </ul>
  * <li>
  * Then
  * <ul>
@@ -54,17 +55,16 @@ import java.util.function.Predicate
 class PropertiesBasedVersionResolver implements VersionResolver {
     private static final logger = LoggerFactory.getLogger PropertiesBasedVersionResolver
     private final Properties versions
-    private Predicate<ModuleVersionSelector> transitiveDependencyPredicate
-
     /**
-     * The {@code transitiveDependencyPredicate} predicate need to be passed in because once dependency resolution has
-     * started, it's not possible to tell which dependency versions were configured "explicitly" in the
-     * {@code dependencies} block (no.1 in class-level JavaDoc), and which dependency versions came from transitive
-     * dependencies (no.4 in class-level JavaDoc).
+     * Once dependency resolution has started, it's not possible to tell which dependency versions were configured
+     * "explicitly" in the {@code dependencies} block (no.1 in class-level JavaDoc), and which dependency versions came
+     * from transitive dependencies (no.4 in class-level JavaDoc).
      * <p>
      * Simply having the caller decide by passing in a {@link Predicate} as a ctor argument seems like a neat enough
      * solution.
      */
+    private Predicate<ModuleVersionSelector> transitiveDependencyPredicate
+
     PropertiesBasedVersionResolver(Properties versions, Predicate<ModuleVersionSelector> isTransitiveDependency) {
         this.versions = Objects.requireNonNull versions
         this.transitiveDependencyPredicate = Objects.requireNonNull isTransitiveDependency

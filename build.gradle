@@ -1,4 +1,4 @@
 wrapper {
-	gradleVersion = '4.5.1'
-	distributionType = 'ALL'
+    gradleVersion = '4.5.1'
+    distributionType = 'ALL'
 }

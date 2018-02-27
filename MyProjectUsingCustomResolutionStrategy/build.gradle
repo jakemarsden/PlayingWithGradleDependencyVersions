@@ -1,0 +1,82 @@
+plugins {
+    id 'java'
+    id 'project-report'
+}
+
+ext {
+    versions = new Properties()
+    file('../DependencyVersions/dependencyVersions.properties').withInputStream versions.&load
+}
+
+repositories {
+    jcenter()
+}
+
+// There are a few different ways of declaring a dependency version which we're interested in
+// In order of descending precedence:
+//   1) The version declared explicitly in the dependencies block
+//       dependencies { compile 'myGroup:myName:myVersion' }
+//   2) The version declared in the properties file (using the full co-ordinate)
+//       myGroup\:myName:myVersion
+//   3) The version declared in the properties file (using only the group)
+//       myGroup:myVersion
+//   4) The transitive dependency version
+//       Given that:
+//           None of the above methods of defining a dependency version were used
+//           "myDependency" is a dependency of the current project
+//           "myDependency" depends on "myTransitiveDependency:1.0"
+//       Then:
+//           Version "1.0" of "myTransitiveDependency" should be used
+
+configurations.all {
+    // Before dependency resolution happens, record the dependency versions we already know about
+    // This will be the versions defined in the "dependencies" block
+    // If we wait until after/during dependency resolution, we won't know if a version
+    //   a) was declared explicitly in the "dependencies" block
+    //   b) came from a transitive dependency
+    def explicitDependencyVersions = []
+    incoming.beforeResolve { ResolvableDependencies resolvable ->
+        explicitDependencyVersions.addAll resolvable.dependencies
+    }
+
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            ModuleVersionSelector target = details.target
+            def explicitDependency = explicitDependencyVersions.find { Dependency dep ->
+                dep.group == target.group && dep.name == target.name
+            }
+
+            def explicitVersion = (explicitDependency) ? explicitDependency.version : null
+            def exactPropertyVersion = versions["$target.group:$target.name"]
+            def groupPropertyVersion = versions[target.group]
+            def transitiveVersion = (explicitVersion) ? null : target.version
+
+            def selectedVersion = explicitVersion
+            selectedVersion = selectedVersion ?: exactPropertyVersion
+            selectedVersion = selectedVersion ?: groupPropertyVersion
+            selectedVersion = selectedVersion ?: transitiveVersion
+
+            final logLevel = LogLevel.DEBUG
+            logger.log logLevel, "Resolving dependency version: $target.group:$target.name:$selectedVersion"
+            logger.log logLevel, "  Explicit dependency version: $explicitVersion"
+            logger.log logLevel, "  Module-level property:       $exactPropertyVersion"
+            logger.log logLevel, "  Group-level property:        $groupPropertyVersion"
+            logger.log logLevel, "  Transitive version:          $transitiveVersion"
+
+            details.useVersion selectedVersion
+        }
+    }
+}
+
+dependencies {
+    // The versions of transitive deps (eg. jackson-annotations and jackson-core)
+    //   are based on those from the properties file (as we're using a custom resolution strategy)
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+
+    // If for some reason you DON'T want to use the version specified in the properties file
+    //   for a specific dependency
+    compile 'commons-io:commons-io:2.5'
+
+    compile 'org.apache.camel:camel-jms'
+    compile 'org.springframework:spring-aop'
+}

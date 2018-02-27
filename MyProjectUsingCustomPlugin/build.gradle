@@ -1,0 +1,36 @@
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.jakemarsden.gradleplugins:dependency-management-plugin:1.0-SNAPSHOT'
+    }
+
+    configurations.all {
+        resolutionStrategy { cacheChangingModulesFor 0, 'seconds' }
+    }
+}
+
+plugins {
+    id 'java'
+    id 'project-report'
+}
+apply plugin: 'com.jakemarsden.dependency-management'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    // The versions of transitive deps (eg. jackson-annotations and jackson-core)
+    //   are based on those from the properties file (as we're using a custom resolution strategy)
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+
+    // If for some reason you DON'T want to use the version specified in the properties file
+    //   for a specific dependency
+    compile 'commons-io:commons-io:2.5'
+
+    compile 'org.apache.camel:camel-jms'
+    compile 'org.springframework:spring-aop'
+}

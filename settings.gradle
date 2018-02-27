@@ -1,0 +1,6 @@
+// Include all child directories (which contain a 'settings.gradle' file) in this multi-project build
+rootProject.projectDir.eachDir { File dir ->
+	if (new File(dir, 'settings.gradle').isFile()) {
+		include ":$dir.name"
+	}
+}

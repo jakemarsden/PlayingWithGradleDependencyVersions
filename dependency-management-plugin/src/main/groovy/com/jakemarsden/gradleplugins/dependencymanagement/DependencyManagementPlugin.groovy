@@ -12,7 +12,7 @@ import org.gradle.api.artifacts.*
  * @author jake.marsden
  */
 class DependencyManagementPlugin implements Plugin<Project> {
-    private static final DEPENDENCY_VERSIONS_PATH = '../DependencyVersions/dependencyVersions.properties'
+    private static final DEPENDENCY_VERSIONS_PATH = '../dependency-versions/versions.properties'
 
     void apply(Project project) {
         Properties versions = loadVersionProperties project

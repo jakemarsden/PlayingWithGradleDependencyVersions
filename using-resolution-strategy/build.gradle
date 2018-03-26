@@ -5,7 +5,7 @@ plugins {
 
 ext {
     versions = new Properties()
-    file('../DependencyVersions/dependencyVersions.properties').withInputStream versions.&load
+    file('../dependency-versions/versions.properties').withInputStream versions.&load
 }
 
 repositories {

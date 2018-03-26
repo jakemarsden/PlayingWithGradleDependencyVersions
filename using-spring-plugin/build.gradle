@@ -4,7 +4,7 @@ plugins {
     id 'project-report'
 }
 
-def dependencyVersionsPath = '../DependencyVersions/dependencyVersions.properties'
+def dependencyVersionsPath = '../dependency-versions/versions.properties'
 ext {
     versions = new Properties()
     file(dependencyVersionsPath).withInputStream versions.&load

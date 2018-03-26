@@ -1,6 +1,5 @@
 package com.jakemarsden.gradleplugins.dependencymanagement
 
-import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.*
@@ -23,7 +22,7 @@ class DependencyManagementPlugin implements Plugin<Project> {
             Collection<Dependency> topLevelDependencies = []
 
             def transitivePredicate = { ModuleVersionSelector module ->
-                // It's transitive if it DOESN'T appear in topLevelDependencies
+                // The "module" arg is transitive if it DOESN'T appear in topLevelDependencies
                 !topLevelDependencies.any { it.group == module.group && it.name == module.name }
             }
             VersionResolver versionResolver = new PropertiesBasedVersionResolver(versions, transitivePredicate)
@@ -46,7 +45,7 @@ class DependencyManagementPlugin implements Plugin<Project> {
         def file = project.file DEPENDENCY_VERSIONS_PATH
         if (!file.isFile()) {
             def msg = "Unable to find the dependency versions property file using the path: $DEPENDENCY_VERSIONS_PATH"
-            throw new InvalidUserDataException(msg)
+            throw new FileNotFoundException(msg)
         }
         def properties = new Properties()
         file.withInputStream properties.&load

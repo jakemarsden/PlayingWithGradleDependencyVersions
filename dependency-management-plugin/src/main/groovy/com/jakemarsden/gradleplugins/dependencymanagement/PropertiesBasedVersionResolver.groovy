@@ -75,7 +75,7 @@ class PropertiesBasedVersionResolver implements VersionResolver {
         def explicitVersion = (isTransitive) ? null : (module.version ?: null)
         def exactPropertyVersion = versions["$module.group:$module.name"]
         def groupPropertyVersion = versions[module.group]
-        def transitiveVersion = (isTransitive) ? module.version : null
+        def transitiveVersion = (isTransitive) ? (module.version ?: null) : null
 
         String resolvedVersion = explicitVersion
         resolvedVersion = resolvedVersion ?: exactPropertyVersion
